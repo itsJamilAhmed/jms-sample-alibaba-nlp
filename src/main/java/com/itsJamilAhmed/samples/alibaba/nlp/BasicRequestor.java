@@ -21,7 +21,7 @@
  *  Apache Qpid JMS 1.1 Solace AMQP Examples: BasicRequestor
  */
 
-package com.solace.samples;
+package com.itsJamilAhmed.samples.alibaba.nlp;
 
 import org.apache.qpid.jms.JmsConnectionFactory;
 

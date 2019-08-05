@@ -21,7 +21,7 @@
  *  Apache Qpid JMS 1.1 Solace AMQP Examples: BasicReplier
  */
 
-package com.solace.samples;
+package com.itsJamilAhmed.samples.alibaba.nlp;
 
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.apache.qpid.jms.JmsTemporaryQueue;
