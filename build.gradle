@@ -2,6 +2,8 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'application'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
 // Don't need these task, so disabling them. Makes it possible to avoid
 // declaring a single application main class.
@@ -14,55 +16,49 @@ run.enabled = false
 distTar.enabled=false
 distZip.enabled=false
 
-applicationName = 'solace-samples-amqp-qpid-jms1'
-version = ''
 
-jar {
-    baseName = 'solace-samples-amqp-qpid-jms1'
-    version =  version
-    manifest {
-        attributes 'Implementation-Title': 'Solace Getting Started Samples',
-                   'Implementation-Version': version
+version = '1.0.0'
+def programName = 'jms-sample-alibaba-nlp'
+applicationName = 'jms-sample-alibaba-nlp'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.6.RELEASE")
     }
 }
+
+
+dependencies {
+
+	//compile("org.apache.qpid:qpid-jms-client:0.27.0")
+	compile group: 'javax.jms', name: 'javax.jms-api', version: '2.0.1'	
+	compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.44.0'
+	compile group: 'net.sourceforge.argparse4j', name: 'argparse4j', version: '0.8.1'
+	compile group: 'log4j', name: 'log4j', version: '1.2.17'
+	
+}
+
+
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    compile("org.apache.qpid:qpid-jms-client:0.27.0")
-}
-
-task createAllStartScripts() << {
-     // just a placeholder
-}
-  
-def scripts = [ 'topicPublisher':'com.solace.samples.TopicPublisher',
-                'topicSubscriber':'com.solace.samples.TopicSubscriber',
-                'queueProducer':'com.solace.samples.QueueProducer',
-                'queueConsumer':'com.solace.samples.QueueConsumer',
-                'basicRequestor':'com.solace.samples.BasicRequestor',
-                'basicReplier':'com.solace.samples.BasicReplier',
-]
-
-scripts.each() { scriptName, className ->
-          def t = tasks.create(name: scriptName+'StartScript', type: CreateStartScripts) {
-        mainClassName = className
-        applicationName = scriptName
-        outputDir = new File(project.buildDir, 'scripts')
-        classpath = jar.outputs.files + project.configurations.runtime
+bootJar {
+    mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.BasicRequestor'
+    baseName = 'AlibabaNLPRequester'
+    version =  ''
+    
+    copy {
+        from bootJar
+        into "."
     }
-    applicationDistribution.into("bin") {
-        from(t)
-        fileMode = 0755
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
-    createAllStartScripts.dependsOn(t)
+
 }
 
-installDist {
-    destinationDir = new File(project.buildDir, 'staged')
-}
-
-assemble.dependsOn installDist
