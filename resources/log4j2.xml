@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+	<Appenders>
+	
+		<!-- Pattern is timestamp, severity, [class name & thread name], message -->
+		<!-- Same for both console and file output -->
+		<!-- Ref: https://logging.apache.org/log4j/2.x/manual/layouts.html -->
+		
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{DEFAULT} |%-5p| [%c{1}-%t] %msg%n" />
+		</Console>
+ 
+		<!-- Roll log every 10MB, max of 20 retained. -->
+		<RollingFile name="RollingFile" filename="log/output.log" filepattern="${logPath}/%d{YYYYMMddHHmmss}-output.log">
+			
+			<PatternLayout pattern="%d{DEFAULT} |%-5p| [%c{1}-%t] %msg%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+ 
+	</Appenders>
+	
+
+	<Loggers>
+
+		<!-- Levels are: trace, debug, info, warn, error, fatal -->
+	
+		<!-- catch-all logger -->
+		<Root level="info">
+			<AppenderRef ref="Console"/>
+			<AppenderRef ref="RollingFile" />
+		</Root>
+		
+		
+		<!-- only show warning and above from the qpid jms API -->
+		<!-- dont cascade up to the parent logger to duplicate the action: additivity="false" -->
+
+		<Logger name="org.apache.qpid" level="warn" additivity="false">
+		  <AppenderRef ref="Console"/>
+		  <AppenderRef ref="RollingFile" />
+		</Logger>
+		
+		<!-- show info and above from the main program -->
+		<Logger name="com.itsJamilAhmed" level="info" additivity="false">
+		  <AppenderRef ref="Console"/>
+		  <AppenderRef ref="RollingFile" />
+		</Logger>
+
+	</Loggers>
+		
+</Configuration>

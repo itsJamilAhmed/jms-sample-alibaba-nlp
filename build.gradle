@@ -36,14 +36,36 @@ buildscript {
 
 dependencies {
 
-	//compile("org.apache.qpid:qpid-jms-client:0.27.0")
 	compile group: 'javax.jms', name: 'javax.jms-api', version: '2.0.1'	
 	compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.44.0'
 	compile group: 'net.sourceforge.argparse4j', name: 'argparse4j', version: '0.8.1'
-	compile group: 'log4j', name: 'log4j', version: '1.2.17'
+	// The log4j 2 SLF4J binding jar:
+	// Ref: https://www.slf4j.org/manual.html
+	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.12.0'
+	// log4j 2 "log4j-core" jar:
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
+	
+	// Alibaba/Aliyun Java SDK for Machine Translation
+	compile group: 'com.aliyun', name: 'aliyun-java-sdk-alimt', version: '1.0.3'
+	// Alibaba/Aliyun Java SDK Core
+	compile group: 'com.aliyun', name: 'aliyun-java-sdk-core', version: '3.5.0'
+	// Process Alibaba/Aliyun SDK Response
+	compile group: 'com.alibaba', name: 'fastjson', version: '1.2.59'
+	
 	
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/main/java' 
+        }
+        resources {
+            srcDir 'resources' 
+        }
+        
+    }
+}
 
 
 repositories {
@@ -51,8 +73,20 @@ repositories {
 }
 
 bootJar {
-    mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.BasicRequestor'
+    mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.TranslationRequestor'
     baseName = 'AlibabaNLPRequester'
+    version =  ''
+    
+    copy {
+        from bootJar
+        into "."
+    }
+
+}
+
+bootJar {
+    mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.TranslationReplier'
+    baseName = 'AlibabaNLPReplier'
     version =  ''
     
     copy {
