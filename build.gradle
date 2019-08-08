@@ -73,18 +73,6 @@ repositories {
 }
 
 bootJar {
-    mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.TranslationRequestor'
-    baseName = 'AlibabaNLPRequester'
-    version =  ''
-    
-    copy {
-        from bootJar
-        into "."
-    }
-
-}
-
-bootJar {
     mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.TranslationReplier'
     baseName = 'AlibabaNLPReplier'
     version =  ''
@@ -95,4 +83,18 @@ bootJar {
     }
 
 }
+
+bootJar {
+    mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.TranslationRequestor'
+    baseName = 'AlibabaNLPRequestor'
+    version =  ''
+    
+    copy {
+        from bootJar
+        into "."
+    }
+
+}
+
+
 

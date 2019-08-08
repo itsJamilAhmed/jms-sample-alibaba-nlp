@@ -276,10 +276,7 @@ public class TranslationRequestor {
         
         }
         
-        
-        
-        
-		// All done, close the objects and shutdown
+   		// All done, close the objects and shutdown
 		try {
 			
 			// Close the input scanner
