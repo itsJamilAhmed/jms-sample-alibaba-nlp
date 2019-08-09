@@ -36,8 +36,23 @@ buildscript {
 
 dependencies {
 
+	// Java Messaging Service
 	compile group: 'javax.jms', name: 'javax.jms-api', version: '2.0.1'	
-	compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.44.0'
+	
+	// JMS Provider's:
+		// Apache Qpid JMS Client (connect to any AMQP1.0 supporting broker)
+		compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.44.0'
+		
+		// Alternative Provider: ActiveMQ JMS Client
+		//compile group: 'org.apache.activemq', name: 'activemq-client', version: '5.15.9'
+		
+		// Alternative Provider: Solace PubSub+ JMS Client
+		//compile group: 'com.solacesystems', name: 'sol-jms', version: '10.6.3'
+		
+		// Alternative Provider: RabbitMQ JMS Client
+		//compile group: 'com.rabbitmq.jms', name: 'rabbitmq-jms', version: '1.12.0'
+	
+	// Arguments parser
 	compile group: 'net.sourceforge.argparse4j', name: 'argparse4j', version: '0.8.1'
 	// The log4j 2 SLF4J binding jar:
 	// Ref: https://www.slf4j.org/manual.html
