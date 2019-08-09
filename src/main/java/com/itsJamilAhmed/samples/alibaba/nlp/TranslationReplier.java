@@ -251,48 +251,55 @@ public class TranslationReplier {
 
             // load a properties file
             prop.load(input);
-
-            // Read the properties from the file and instantiate the service
-
-            String[] expectedProps = { "service-region", "access-key-id", "access-key-secret"};
-            
-            for (String property : expectedProps ) {
-            	if (prop.getProperty(property) == null)
-            	{
-            		logger.error("Expected property '{}' not found in properties file! Exiting.", property);
-            		System.exit(1);
-            	}
+ 
+            // Special property in the file that can also put the translation element into simulation mode...
+            if (prop.containsKey("simulation-mode") && prop.getProperty("simulation-mode").equalsIgnoreCase("true")) {
+            	logger.info("Machine Translation Service instantiated in simulation mode");
+            	mtService = new MachineTranslationService(true);
             }
+            else {
+         
+            	// Read the properties from the file and instantiate the service
+                String[] expectedProps = { "service-region", "access-key-id", "access-key-secret"};
+                for (String property : expectedProps ) {
+                	if (prop.getProperty(property) == null)
+                	{
+                		logger.error("Expected property '{}' not found in properties file! Exiting.", property);
+                		System.exit(1);
+                	}
+                }
             
-            logger.debug("Instantiating Machine Translation Service with Service Region: '{}', Access Key ID: '{}', Access Key Secret: '{}'", 
-            		prop.getProperty("service-region"), 
-            		prop.getProperty("access-key-id"),
-            		prop.getProperty("access-key-secret"));
-            
-            try {
-				mtService = new MachineTranslationService(
-						prop.getProperty("service-region"), 
-						prop.getProperty("access-key-id"),
-						prop.getProperty("access-key-secret"));
-				
-				// The instantiation will throw an error if the parameters are found to be invalid following a "self-test" request.
-				logger.info("Machine Translation Service instantiated");
-				
-			} catch (Exception e) {
-				logger.error("Error occurred during Machine Translation Service instantiation (Service Region: '{}', Access Key ID: '{}', Access Key Secret: '{}'). Error message: {}", 
-            		prop.getProperty("service-region"), 
-            		prop.getProperty("access-key-id"),
-            		prop.getProperty("access-key-secret"),
-            		e.getMessage());
-				
-				System.exit(1);
-			}
+	            logger.debug("Instantiating Machine Translation Service with Service Region: '{}', Access Key ID: '{}', Access Key Secret: '{}'", 
+	            		prop.getProperty("service-region"), 
+	            		prop.getProperty("access-key-id"),
+	            		prop.getProperty("access-key-secret"));
+	            
+	            try {
+					mtService = new MachineTranslationService(
+							prop.getProperty("service-region"), 
+							prop.getProperty("access-key-id"),
+							prop.getProperty("access-key-secret"));
+					
+					// The instantiation will throw an error if the parameters are found to be invalid following a "self-test" request.
+					logger.info("Machine Translation Service instantiated");
+					
+				} catch (Exception e) {
+					logger.error("Error occurred during Machine Translation Service instantiation (Service Region: '{}', Access Key ID: '{}', Access Key Secret: '{}'). Error message: {}", 
+	            		prop.getProperty("service-region"), 
+	            		prop.getProperty("access-key-id"),
+	            		prop.getProperty("access-key-secret"),
+	            		e.getMessage());
+					
+					System.exit(1);
+				}
+            }
                       
         } catch (Exception e) {
             logger.error("Error occurred while processing the properties file." + e.getMessage());
+            System.exit(1);
         }
     	
-    	// Start the thread with the collected parameters
+    	// Start the thread with the jndi file path and the MT Service to utilise.
         new TranslationReplier().run(
         		parameters.get("jndi_properties").toString(),
         		mtService);

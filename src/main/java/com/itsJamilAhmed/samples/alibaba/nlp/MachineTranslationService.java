@@ -21,6 +21,10 @@ class MachineTranslationService {
 	private TranslateGeneralRequest generalRequestToEnglish;
 	private TranslateGeneralRequest generalRequestToChinese;
 	private TranslateGeneralResponse generalResponse;
+	private boolean isSimulation = false;
+	
+	final String SIMULATED_ENGLISH = "Test Message";
+	final String SIMULATED_CHINESE = "测试消息";
 	
 	public MachineTranslationService(String serviceRegion, String accessKeyId, String accessKeySecret) throws Exception {
 				
@@ -45,6 +49,20 @@ class MachineTranslationService {
  
 	}
 	
+	public MachineTranslationService(boolean simulationMode) throws Exception {
+		
+		// Will only accept this to be true, handle the false a better way?
+		if (simulationMode)
+		{
+			this.isSimulation = true;
+		}
+		else
+		{
+			throw new Exception ("This constructor can only be called with value true.");
+		}
+		
+	}
+	
 	private void selfTest () throws Exception {
 		// Need to try out a request to make sure the parameters are good.
 		try {
@@ -61,8 +79,11 @@ class MachineTranslationService {
 	
 	public String translateChineseToEnglish (String translationText) throws Exception {
 
+		if (this.isSimulation) {
+			return SIMULATED_ENGLISH;
+		}
+		
 		String translationResponse = "";
-
 		try {
 			generalRequestToEnglish.setSourceText(URLEncoder.encode(translationText,"UTF-8"));
 			generalResponse = client.getAcsResponse(generalRequestToEnglish);  
@@ -71,6 +92,10 @@ class MachineTranslationService {
 			if (translationResponseJSON.getInteger("code") == REQUEST_OK_CODE) {
 				// Request was OK
 				translationResponse = translationResponseJSON.getJSONObject("data").getString("translated");
+			}
+			else {
+				// Not seen one of these yet so not sure what it will contain...
+				throw new Exception("Received a non-OK response from SDK: " + translationResponseJSON.toString());
 			}
 			
 		} catch (UnsupportedEncodingException e) {
@@ -87,8 +112,10 @@ class MachineTranslationService {
 	
 	public String translateEnglishToChinese (String translationText) throws Exception {
 		
+		if (this.isSimulation) {
+			return SIMULATED_CHINESE;
+		}
 		String translationResponse = "";
-		;
 		try {
 			generalRequestToChinese.setSourceText(URLEncoder.encode(translationText,"UTF-8"));
 			generalResponse = client.getAcsResponse(generalRequestToChinese);  
@@ -99,7 +126,8 @@ class MachineTranslationService {
 				translationResponse = translationResponseJSON.getJSONObject("data").getString("translated");
 			}
 			else {
-				System.err.println("Received a non-OK response from SDK: " + translationResponseJSON.toString());
+				// Not seen one of these yet so not sure what it will contain...
+				throw new Exception("Received a non-OK response from SDK: " + translationResponseJSON.toString());
 			}
 			
 			
