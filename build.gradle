@@ -72,16 +72,17 @@ repositories {
     mavenCentral()
 }
 
-bootJar {
-    mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.TranslationReplier'
+task bootJarReplier (type: org.springframework.boot.gradle.tasks.bundling.BootJar){
+	mainClassName = 'com.itsJamilAhmed.samples.alibaba.nlp.TranslationReplier'
     baseName = 'AlibabaNLPReplier'
     version =  ''
     
+    with bootJar
+    
     copy {
-        from bootJar
+        from bootJarReplier
         into "."
     }
-
 }
 
 bootJar {
@@ -93,8 +94,8 @@ bootJar {
         from bootJar
         into "."
     }
+    
 
 }
 
-
-
+bootJar.dependsOn bootJarReplier
