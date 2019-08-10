@@ -25,6 +25,7 @@ To check out the project, clone this GitHub repository:
 
 ```
 git clone https://github.com/itsJamilAhmed/jms-sample-alibaba-nlp
+cd jms-sample-alibaba-nlp/
 ```
 
 ## Running the Samples
@@ -67,6 +68,7 @@ _(Currently, the service is only available from a single region of "cn-hangzhou"
 If you do not have access to the service yet and want to test the programs, the following property will run it in an offline simulation mode where JMS messages are passed between the applications, just the translation result is a placeholder:
 
 ```
+# Optional parameter to start the Machine Translation functionality in a offline/simulation mode:
 simulation-mode=true
 ```
 
@@ -90,7 +92,14 @@ java -jar AlibabaNLPRequestor.jar -j ./jndi.properties
 
 In the requestor program enter text at the prompt and each new will result in a request being sent for translation. The next line response will show you the result.
 
+Example output from requestor program:
 
+![Console output from AlibabaNLPRequestor.jar](images/requestor-console.jpg)
+
+
+Example output from replier program:
+
+![Console output from AlibabaNLPReplier.jar](images/replier-console.jpg)
 
 ## Additional Information
 
