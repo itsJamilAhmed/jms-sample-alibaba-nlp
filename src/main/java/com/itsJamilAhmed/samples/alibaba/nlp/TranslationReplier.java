@@ -173,7 +173,8 @@ public class TranslationReplier {
                 	// Check if the expected type of message was received
 					if (request instanceof TextMessage) {
 						String translationRequest = ((TextMessage) request).getText();
-					    logger.debug("TextMessage response received: '" + translationRequest + "'");
+					    logger.debug("TextMessage request received. Content: '{}', Destination: '{}', ReplyTo: '{}', CorrelationID: '{}', MessageID: '{}'", 
+					    		translationRequest, request.getJMSDestination(), request.getJMSReplyTo(), request.getJMSCorrelationID(), request.getJMSMessageID());
 					    
 					    // Extract the reply-to destination and send a response
 					    Destination replyDestination = request.getJMSReplyTo();
@@ -187,8 +188,13 @@ public class TranslationReplier {
 	                        String translationResponse = mtService.translateEnglishToChinese(translationRequest);
 	                        reply.setText(translationResponse);
 
-	                        // Copy the correlation ID from the request to the reply
-	                        reply.setJMSCorrelationID(request.getJMSCorrelationID());
+	                        // Copy the correlation ID from the request to the reply if one is present, otherwise use the MessageID as an alternative
+	                        if (request.getJMSCorrelationID() == null) {
+	                        	reply.setJMSCorrelationID(request.getJMSMessageID());
+	                        }
+	                        else {
+	                        	reply.setJMSCorrelationID(request.getJMSCorrelationID());
+	                        }
 
 	                        // Send the reply
 	                        producer.send(replyDestination, reply, DeliveryMode.NON_PERSISTENT,
