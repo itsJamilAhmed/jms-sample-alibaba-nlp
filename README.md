@@ -1,5 +1,21 @@
 # JMS Samples using Alibaba Cloud's Natural Language Processing (NLP) SDK: Machine Translation (a.k.a Aliyun MT)
 
+__Table of Contents__
+* [What does this demonstrate?](#what-does-this-demonstrate)
+* [Repository Contents](#repository-contents)
+* [Checking Out](#checking-out)
+* [Running the Samples](#running-the-samples)
+  * Pre-requisites
+  * Step 1: Enter your JMS broker's connectivity details in the JNDI file
+  * Step 2: Enter your Machine Translation service's connectivity details in the properties file
+  * Step 3: Start the replier program
+  * Step 4: Start the responder program
+  * Step 5: Get translating!
+* [Advanced Steps](#advanced-steps)
+  * Running against alternative JMS Providers 
+  * Submitting HTTP Requests to the JMS Receiver
+
+
 ## What does this demonstrate?
 
 There are two applications coded to the JMS API in a Requestor and Replier role, respectively. (i.e. Implementing the [request-reply](https://www.enterpriseintegrationpatterns.com/patterns/messaging/RequestReplyJmsExample.html) enterprise integration pattern.)
@@ -10,7 +26,7 @@ Finally, the request-reply interaction is around the translation of English-lang
 
 The requestor program collects user input from the console and submits each line for translation as a JMS request message. The replier program receives the JMS request message, calls the Machine Translation API to translate the text payload to Chinese, and responds with the result as a new JMS reply message. The requestor program outputs to screen the Chinese-language translation.
 
-## Contents
+## Repository Contents
 
 This repository contains:
 
@@ -101,7 +117,7 @@ Example output from replier program:
 
 ![Console output from AlibabaNLPReplier.jar](images/replier-console.jpg)
 
-## Additional Information
+## Advanced Steps
 
 ### Running against alternative JMS Providers 
 
@@ -132,7 +148,7 @@ Example files have been included in the project on how to connect successfully t
 - [solacepubsub-jndi.properties](solacepubsub-jndi.properties)
 - [activemq-jndi.properties](activemq-jndi.properties)
 
-
+### Submitting HTTP Requests to the JMS Receiver
 
 
 
