@@ -12,8 +12,8 @@ __Table of Contents__
   * Step 4: Start the responder program
   * Step 5: Get translating!
 * [Advanced Steps](#advanced-steps)
-  * Running against alternative JMS Providers 
-  * Submitting HTTP Requests to the JMS Receiver
+  * [Running against alternative JMS Providers](#running-against-alternative-jms-providers) 
+  * [Submitting HTTP Requests to the JMS Receiver](#submitting-http-requests-to-the-jms-receiver)
 
 
 ## What does this demonstrate?
@@ -149,6 +149,78 @@ Example files have been included in the project on how to connect successfully t
 - [activemq-jndi.properties](activemq-jndi.properties)
 
 ### Submitting HTTP Requests to the JMS Receiver
+
+You may have an environment where your applications using JMS need to communicate with newly developed services that do not use JMS, but say support HTTP interactions only.
+One advantage of selecting [Solace PubSub+](https://www.solace.dev/) as a JMS provider is the in-built [REST Microgateway feature](https://docs.solace.com/Overviews/Microgateway-Concepts/Microgateways-Overview.htm).
+
+The steps below will demonstrate how a HTTP POST via the curl tool can send the request to the same JMS receiver, for the response to seamlessly arrive as a HTTP response to the original POST. 
+
+(Both programs will connect to a Solace PubSub+ JMS provider, which can still use the Qpid JMS API since Solace PubSub+ is also supporting the necessary AMQP1.0 protocol.)
+
+#### Step 1: Adjust the topic destination of the existing programs
+
+You will recall that the JNDI lookup label for the Requestor and Replier programs were already different/decoupled from each other. (i.e. They do not look up the same label from the JNDI.) This decoupling will be helpful now for this new requirement.
+
+The Microgateway feature maps the URI of the REST Endpoint to the messaging topic names like so:
+```
+http://yourdomain:9000/path/goes/here	-> 	<REST-OPERATION>/path/goes/here	
+```
+So if your were doing a `POST` operation to `http://yourdomain:9000/path/goes/here` the resulting topic would be `POST/path/goes/here` for the applications that are connecting with messaging APIs like JMS.
+
+To incorporate this additional level to the topic structure, lets update the [jndi.properties](jndi.properties) file like so:
+
+```
+topic.nlp-translation-requests-send = jms/nlp/translation/requests
+topic.nlp-translation-requests-receive = */nlp/translation/requests
+```
+
+In short, the Requestor program will publish request messages to a topic beginning with `jms`, which can serve to signal that it is a JMS publisher.
+The Replier program will subscribe to request messages from a new `wildcard topic` where it will accept requests that originate from `jms` senders as well as the HTTP clients through operations such as `POST`.
+
+(It is assumed the ConnectionFactory is already connecting via the AMQP protocol to your Solace PubSub+ JMS broker.)
+
+Re-launch the programs with these changes in effect.
+
+#### Step 2: Setup curl for the POST operation
+
+For the same Solace PubSub+ broker, fetch the connectivity details for the REST protocol: `client-username`, `password` and `REST Host`.
+If you are using an instance in [Solace Cloud](https://solace.com/cloud/), an example of where to find this is below:
+
+![REST Connection Details Section](images/REST-section-solace-cloud.JPG)
+
+For convenience, lets add those details to shell variables like so:
+
+```
+$ USER=solace-cloud-client
+$ PASS=your-password-here
+$ REST_ENDPOINT="http://your-instance-here.messaging.solace.cloud:9000/nlp/translation/requests"
+```
+
+When the JMS programs receive requests and respond to them, they expect a `CorrelationID` to be present to properly respond to the requests. For the HTTP POST we can pass this in the header, so let's setup a variable for this too:
+
+```
+$ CORRELATION="Solace-Correlation-ID: aRandomString"
+```
+
+Lastly, another header is required to specify that this is plain text being sent, and not say binary. This final shell variable can set this up too:
+
+```
+$ TYPE="Content-Type: text/plain"
+```
+
+The combined curl command now executes like so:
+
+```
+$ curl -u $USER:$PASS -d "This request is via HTTP POST" -H $TYPE -H $CORRELATION -X POST $REST_ENDPOINT
+```
+
+Here is an example response with it all put together:
+
+![curl POST Example Image](images/curl-post-console.jpg)
+
+On the Replier logs you can see messages being handled from both the JMS and HTTP sources like so:
+
+![Replier console with both JMS and HTTP Requests being handled](images/replier-console-with-HTTP.jpg)
 
 
 
