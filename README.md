@@ -184,9 +184,9 @@ Re-launch the programs with these changes in effect.
 
 #### Step 2: Switch the REST service into 'Gateway' mode
 
-The Solace PubSub+ REST connectivity feature can operaye in two modes: `messaging` and `gateway`. The default setting for a newly created broker or cloud service is `messaging` but we need it operating in 'gateway' mode for this exercise.
+The Solace PubSub+ REST connectivity feature can operate in two modes: `messaging` and `gateway`. The default setting for a newly created broker or cloud service is `messaging` but we need it operating in 'gateway' mode for this exercise.
 
-Follow the instructions [here](https://docs.solace.com/Configuring-and-Managing/Microgateway-Tasks/Managing-Microgateway.htm#Configure_VPN_Mode) to change the modes for your broker.
+Follow the instructions [here](https://docs.solace.com/Configuring-and-Managing/Microgateway-Tasks/Managing-Microgateway.htm#Configure_VPN_Mode) to change the mode for your broker.
 
 #### Step 3: Setup curl for the POST operation
 
@@ -232,9 +232,9 @@ On the Replier logs you can see messages being handled from both the JMS and HTT
 ### How to submit MQTT Requests to the JMS Application Receiver
 
 [MQTT](http://mqtt.org/) is a lightweight, standard protocol that is well suited for ["Internet of Things (IoT)"](https://en.wikipedia.org/wiki/Internet_of_things) connectivity for devices.
-You will typically have the situation that these IoT devices are supported by application services that are running in a data-centre or cloud for data processing or feature delivery. Those existing application services may already be communicating amongst themselves using a JMS provider so bridging these new MQTT protcol messages for seamless delivery to those JMS receivers can be a huge advantage. 
+You will typically have the situation that these IoT devices are supported by application services that are running in a data-centre or cloud for data processing or feature delivery. Those existing application services may already be communicating amongst themselves using a JMS provider so bridging these new MQTT protocol messages for seamless delivery to those JMS receivers can be a huge advantage. 
 
-As was described in the earlier '[How to submit HTTP...]'(#how-to-submit-http-requests-to-the-jms-application-receiver) above, selecting [Solace PubSub+ Event Broker](https://www.solace.dev/) as your JMS Provider has these added advantages of native protocol-translation without needing to deploy additional products in your environment.
+As was described in the earlier '[How to submit HTTP...](#how-to-submit-http-requests-to-the-jms-application-receiver)' above, selecting [Solace PubSub+ Event Broker](https://www.solace.dev/) as your JMS Provider has these added advantages of native protocol-translation without needing to deploy additional products in your environment.
 
 The below example will demonstrate how a message sent via the MQTT protocol over WebSockets can arrive at the same JMS receiver for further processing.
 
