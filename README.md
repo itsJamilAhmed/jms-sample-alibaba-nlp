@@ -13,7 +13,8 @@ __Table of Contents__
   * Step 5: Get translating!
 * [Advanced Steps](#advanced-steps)
   * [Running against alternative JMS Providers](#running-against-alternative-jms-providers) 
-  * [Submitting HTTP Requests to the JMS Receiver](#submitting-http-requests-to-the-jms-receiver)
+  * [How to submit HTTP Requests to the JMS Application Receiver](#how-to-submit-http-requests-to-the-jms-application-receiver)
+  * [How to submit MQTT Requests to the JMS Application Receiver](#how-to-submit-mqtt-requests-to-the-jms-application-receiver)
 
 
 ## What does this demonstrate?
@@ -148,10 +149,10 @@ Example files have been included in the project on how to connect successfully t
 - [solacepubsub-jndi.properties](solacepubsub-jndi.properties)
 - [activemq-jndi.properties](activemq-jndi.properties)
 
-### Submitting HTTP Requests to the JMS Receiver
+### How to submit HTTP Requests to the JMS Application Receiver
 
 You may have an environment where your applications using JMS need to communicate with newly developed services that do not use JMS, but say support HTTP interactions only.
-One advantage of selecting [Solace PubSub+](https://www.solace.dev/) as a JMS provider is the in-built [REST Microgateway feature](https://docs.solace.com/Overviews/Microgateway-Concepts/Microgateways-Overview.htm).
+One advantage of selecting [Solace PubSub+ Event Broker](https://www.solace.dev/) as a JMS provider is the in-built [REST Microgateway feature](https://docs.solace.com/Overviews/Microgateway-Concepts/Microgateways-Overview.htm).
 
 The steps below will demonstrate how a HTTP POST via the curl tool can send the request to the same JMS receiver, for the response to seamlessly arrive as a HTTP response to the original POST. 
 
@@ -181,7 +182,13 @@ The Replier program will subscribe to request messages from a new `wildcard topi
 
 Re-launch the programs with these changes in effect.
 
-#### Step 2: Setup curl for the POST operation
+#### Step 2: Switch the REST service into 'Gateway' mode
+
+The Solace PubSub+ REST connectivity feature can operaye in two modes: `messaging` and `gateway`. The default setting for a newly created broker or cloud service is `messaging` but we need it operating in 'gateway' mode for this exercise.
+
+Follow the instructions [here](https://docs.solace.com/Configuring-and-Managing/Microgateway-Tasks/Managing-Microgateway.htm#Configure_VPN_Mode) to change the modes for your broker.
+
+#### Step 3: Setup curl for the POST operation
 
 For the same Solace PubSub+ broker, fetch the connectivity details for the REST protocol: `client-username`, `password` and `REST Host`.
 If you are using an instance in [Solace Cloud](https://solace.com/cloud/), an example of where to find this is below:
@@ -211,7 +218,7 @@ $ TYPE="Content-Type: text/plain"
 The combined curl command now executes like so:
 
 ```
-$ curl -u $USER:$PASS -d "This request is via HTTP POST" -H $TYPE -H $CORRELATION -X POST $REST_ENDPOINT
+$ curl -u $USER:$PASS -d "This request is via HTTP POST" -H "$TYPE" -H "$CORRELATION" -X POST $REST_ENDPOINT
 ```
 
 Here is an example response with it all put together:
@@ -222,8 +229,41 @@ On the Replier logs you can see messages being handled from both the JMS and HTT
 
 ![Replier console with both JMS and HTTP Requests being handled](images/replier-console-with-HTTP.jpg)
 
+### How to submit MQTT Requests to the JMS Application Receiver
+
+[MQTT](http://mqtt.org/) is a lightweight, standard protocol that is well suited for ["Internet of Things (IoT)"](https://en.wikipedia.org/wiki/Internet_of_things) connectivity for devices.
+You will typically have the situation that these IoT devices are supported by application services that are running in a data-centre or cloud for data processing or feature delivery. Those existing application services may already be communicating amongst themselves using a JMS provider so bridging these new MQTT protcol messages for seamless delivery to those JMS receivers can be a huge advantage. 
+
+As was described in the earlier '[How to submit HTTP...]'(#how-to-submit-http-requests-to-the-jms-application-receiver) above, selecting [Solace PubSub+ Event Broker](https://www.solace.dev/) as your JMS Provider has these added advantages of native protocol-translation without needing to deploy additional products in your environment.
+
+The below example will demonstrate how a message sent via the MQTT protocol over WebSockets can arrive at the same JMS receiver for further processing.
+
+**Note:** As this 'How to' is a continuation of the earlier one for HTTP, it is assumed you have completed 'Step 1' and 'Step 2' from [here](#how-to-submit-http-requests-to-the-jms-application-receiver). 
+
+#### Step 1: Selection of the MQTT Publisher
+
+As MQTT is a standard connectivity protocol, any MQTT client API can publish to the Solace PubSub+ broker. (i.e. There is no API required to be fetched from Solace.) Therefore we can use the online hosted JavaScript-over-WebSockets MQTT utility by Eclipse Paho for this demonstration. That is available here: https://www.eclipse.org/paho/clients/js/utility/
+
+#### Step 2: Enter the connectivity details for your Solace PubSub+ Broker
+
+Copy in the connectivity details into the online client like so:
+
+![Eclipse Paho MQTT Connection](images/Eclipse-Paho-MQTT-WebSocket-Connection.jpg)
 
 
+#### Step 3: Enter the topic and message for sending
+
+This request can be sent to the MQTT specific topic of `mqtt/nlp/translation/requests` like so:
+
+![Eclipse Paho MQTT Sender](images/Eclipse-Paho-MQTT-WebSocket-Sender.jpg)
+
+#### Step 4: Review Replier program console or log output
+
+You will recall that our JMS programs are utilising a 'request-reply' pattern of message exchange, with a 'reply-to' topic being essential to see the translation response. As this hosted MQTT client is not carrying out all these necessary steps tbe request will not be properly dealt with. However evidence of the message arrival and processing of the content can be seen in the logs as follows:
+
+![MQTT Request being ignored](images/replier-console-with-MQTT.jpg)
+
+While the lightweight MQTT protocol does not explicitely define a request-reply mechanism, it can very easily be simulated using custom defined topics and headers. For further information on how you may build your own MQTT sender to properly implement the request-reply pattern to successfully get a translation response back to the MQTT sender, read the following guide: [Solace MQTT Samples - Rquest/Reply](https://solace.com/samples/solace-samples-mqtt/request-reply/)
 
 
 
