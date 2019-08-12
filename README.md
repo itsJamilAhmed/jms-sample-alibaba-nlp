@@ -259,7 +259,7 @@ This request can be sent to the MQTT specific topic of `mqtt/nlp/translation/req
 
 #### Step 4: Review Replier program console or log output
 
-You will recall that our JMS programs are utilising a 'request-reply' pattern of message exchange, with a 'reply-to' topic being essential to see the translation response. As this hosted MQTT client is not carrying out all these necessary steps tbe request will not be properly dealt with. However evidence of the message arrival and processing of the content can be seen in the logs as follows:
+You will recall that our JMS programs are utilising a 'request-reply' pattern of message exchange, with a 'reply-to' topic being essential to see the translation response. As this hosted MQTT client is not carrying out all these necessary steps the request will not be properly dealt with. However evidence of the message arrival and processing of the content can be seen in the logs as follows:
 
 ![MQTT Request being ignored](images/replier-console-with-MQTT.jpg)
 
