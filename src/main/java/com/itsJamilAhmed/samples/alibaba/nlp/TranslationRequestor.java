@@ -128,11 +128,13 @@ public class TranslationRequestor {
 		}
 		catch (NameNotFoundException ne) {
 			logger.error("Could not find the label '{}' in the JNDI for lookup." , ne.getExplanation()); 
-	        System.exit(1); 
+			logger.error("Exiting program.");
+			System.exit(1);
 		}
 		catch (Exception e) {
 			logger.error("Error occurred during JNDI lookups: " + e.toString()); 
-	        System.exit(1); 
+			logger.error("Exiting program.");
+			System.exit(1);
 		} 
 
 		// Try connecting and creating the session
@@ -147,7 +149,8 @@ public class TranslationRequestor {
 			
 		} catch (Exception e) {
 			logger.error("Could not connect to the JMS Broker: " + e.toString()); 
-	        System.exit(1); 
+			logger.error("Exiting program.");
+			System.exit(1);
 		}
         
 
@@ -170,7 +173,8 @@ public class TranslationRequestor {
 			
 		} catch (JMSException e) {
 			logger.error("Could not setup producer and consumer objects: " + e.toString()); 
-	        System.exit(1); 
+			logger.error("Exiting program.");
+			System.exit(1);
 		}
         
         
@@ -219,6 +223,8 @@ public class TranslationRequestor {
     				
     		} catch (JMSException e) {
     			logger.error("Error occurred during request message sending: " + e.toString()); 
+    			logger.error("Exiting program.");
+    			System.exit(1);
     		}
             
             
@@ -268,6 +274,8 @@ public class TranslationRequestor {
     			
     		} catch (JMSException e) {
     			logger.error("Error occurred during reply message receive: " + e.toString()); 
+    			logger.error("Exiting program.");
+    			System.exit(1);
     		}     
             
             // This output goes to stdout?
@@ -290,6 +298,8 @@ public class TranslationRequestor {
 			connection.close();
 		} catch (JMSException e) {
 			logger.error("Error occurred during the shutdown process: " + e.toString()); 
+			logger.error("Exiting program.");
+			System.exit(1);
 		}
   
         
