@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.Properties;
 
+import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
@@ -167,14 +168,32 @@ public class TranslationReplier {
         consumer.setMessageListener(new MessageListener() {
             @Override
             public void onMessage(Message request) {
+            	
+            	String translationRequest = "";
+            	
                 try {
                 	logger.debug("Received request message, processing...");
                 	
-                	// Check if the expected type of message was received
-					if (request instanceof TextMessage) {
-						String translationRequest = ((TextMessage) request).getText();
-					    logger.debug("TextMessage request received. Content: '{}', Destination: '{}', ReplyTo: '{}', CorrelationID: '{}', MessageID: '{}'", 
-					    		translationRequest, request.getJMSDestination(), request.getJMSReplyTo(), request.getJMSCorrelationID(), request.getJMSMessageID());
+                	// Check if the expected type of message was received. Let's support TextMessage and BytesMessage (assuming its Text inside.).
+                	
+					if (request instanceof TextMessage ||  request instanceof BytesMessage ) {
+						
+						if (request instanceof TextMessage) {
+							translationRequest = ((TextMessage) request).getText();
+						    logger.debug("TextMessage request received. Content: '{}', Destination: '{}', ReplyTo: '{}', CorrelationID: '{}', MessageID: '{}'", 
+						    		translationRequest, request.getJMSDestination(), request.getJMSReplyTo(), request.getJMSCorrelationID(), request.getJMSMessageID());
+						}
+						else {
+							// BytesMessage then... Need to get length and then read bytes appropriately
+							BytesMessage bytesMessage = (BytesMessage) request;
+							byte[] data = new byte[(int) bytesMessage.getBodyLength()];							
+						    bytesMessage.readBytes(data);
+						    translationRequest =  new String(data);
+							
+						    logger.debug("BytesMessage request received. Content as String: '{}', Destination: '{}', ReplyTo: '{}', CorrelationID: '{}', MessageID: '{}'", 
+						    		translationRequest, request.getJMSDestination(), request.getJMSReplyTo(), request.getJMSCorrelationID(), request.getJMSMessageID());
+							
+						}
 					    
 					    // Extract the reply-to destination and send a response
 					    Destination replyDestination = request.getJMSReplyTo();
@@ -205,17 +224,19 @@ public class TranslationReplier {
 
 	                    } else {
 	                    	// Nowhere to send the reply to!
-	                        logger.debug("Received message without reply-to field.");
+	                        logger.info("Ignoring a request on destination '{}' with empty reply-to field. Content: '{}', ReplyTo: '{}', CorrelationID: '{}', MessageID: '{}'",
+	                        		request.getJMSDestination(), translationRequest, request.getJMSReplyTo(), request.getJMSCorrelationID(), request.getJMSMessageID());
 	                    }
 					    
 					} else {
 						// Replier not coordinated as expected on message type, nothing to do.
-						logger.debug("Message request received but not expected TextMessage type.");
+						logger.debug("Message request received but not expected TextMessage or BytesMessage type. Destination: '{}', ReplyTo: '{}', CorrelationID: '{}', MessageID: '{}'", 
+				    		request.getJMSDestination(), request.getJMSReplyTo(), request.getJMSCorrelationID(), request.getJMSMessageID());
 					}
                 	
                     
                 } catch (Exception ex) {
-                    logger.error("Error occurred during processing of incoming request message.");
+                    logger.error("Error occurred during processing of incoming request message: " + ex.getMessage());
                 }
             }
         });
